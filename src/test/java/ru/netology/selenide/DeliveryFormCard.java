@@ -31,7 +31,7 @@ class DeliveryFormCard {
         $("[data-test-id=date] input").doubleClick();
         $("[data-test-id=date] input").sendKeys(" ");
         $("[data-test-id=date] input").setValue(formattedDate);
-        $("[data-test-id=name] input").setValue("Наталья");
+        $("[data-test-id=name] input").setValue("Наталья Иванова-Петрова");
         $("[data-test-id=phone] input").setValue("+79670000000");
         $("[data-test-id=agreement]").click();
         form.$(".button_theme_alfa-on-white").click();
