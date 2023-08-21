@@ -1,11 +1,10 @@
 package ru.netology.selenide;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.SelenideElement;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Keys;
 
-
-import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selectors.withText;
 import static com.codeborne.selenide.Selenide.$;
 import static com.codeborne.selenide.Selenide.open;
 
@@ -16,26 +15,27 @@ import java.time.format.DateTimeFormatter;
 
 class DeliveryFormCard {
 
-    @Test
-    void testingPositiveDeliveryFormCard() throws InterruptedException {
-        LocalDate currentDate = LocalDate.now();  // получение экземпляра класса LocalDate с текущей датой
-        LocalDate incrementedDate = currentDate.plusDays(3);  // увеличение даты на 3 дня
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        String formattedDate = incrementedDate.format(formatter);
+    public String generateDate(long addDays, String pattern) {
+        return LocalDate.now().plusDays(addDays).format(DateTimeFormatter.ofPattern(pattern));
+    }
 
+
+    @Test
+    void testingPositiveDeliveryFormCard() {
 
         open("http://localhost:9999");
         SelenideElement form = $(".form_theme_alfa-on-white");
         form.$("[data-test-id=city] input").setValue("Казань");
-
-        $("[data-test-id=date] input").doubleClick();
-        $("[data-test-id=date] input").sendKeys(" ");
-        $("[data-test-id=date] input").setValue(formattedDate);
+        String planningDate = generateDate(8, "dd.MM.yyyy");
+        $("[data-test-id=date] input").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.DELETE);
+        $("[data-test-id=date] input").setValue(planningDate);
         $("[data-test-id=name] input").setValue("Наталья Иванова-Петрова");
         $("[data-test-id=phone] input").setValue("+79670000000");
         $("[data-test-id=agreement]").click();
         form.$(".button_theme_alfa-on-white").click();
-        $(withText("Встреча успешно забронирована")).shouldBe(visible, Duration.ofSeconds(12));
 
+        $(".notification__content")
+                .shouldHave(Condition.text("Встреча успешно забронирована на " + planningDate), Duration.ofSeconds(15))
+                .shouldBe(Condition.visible);
     }
 }
